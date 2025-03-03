@@ -2,6 +2,8 @@ from flask import Blueprint
 
 
 dm = Blueprint('dm', __name__)
+
+
 @dm.route('/', methods=['POST'])
 def index():
     try:

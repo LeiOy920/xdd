@@ -1,22 +1,20 @@
-# from flask import Flask
-# from flask_sqlalchemy import SQLAlchemy
-# from flask_migrate import Migrate
-# import os
-#
-# db = SQLAlchemy()
-# migrate = Migrate()
-#
-# def create_app():
-#     app = Flask(__name__)
-#     app.config.from_object('app.config.Config')
-#
-#     db.init_app(app)
-#     migrate.init_app(app, db)
-#
-#     from app.routes import main as main_blueprint
-#     app.register_blueprint(main_blueprint)
-#
-#     return app
-import pymysql
+from flask import Flask
+from flask_cors import CORS
 
-pymysql.install_as_MySQLdb()
+
+
+
+def create_app():
+    from app.config import app
+
+    CORS(app)
+
+    from app.routes.movieDetails.dm import dm
+    from app.routes.BigScreen.bangdan import bd
+    from app.routes.BigScreen.mapChart import map
+
+    app.register_blueprint(dm, url_prefix='/dm')
+    app.register_blueprint(map, url_prefix='/map')
+    app.register_blueprint(bd, url_prefix='/bd')
+
+    return app
