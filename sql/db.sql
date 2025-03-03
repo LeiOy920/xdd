@@ -66,7 +66,7 @@ CREATE TABLE person (
     career TEXT COMMENT 'Career path'
 );
 
-CREATE TABLE data_1905 (
+CREATE TABLE die_graph_data (
     id INT AUTO_INCREMENT PRIMARY KEY,
     data_name VARCHAR(255) COMMENT 'Data name',
     chart_type VARCHAR(255) COMMENT 'Chart type',
