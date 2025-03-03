@@ -1,6 +1,5 @@
 from flask import Blueprint
 
-import app
 
 dm = Blueprint('dm', __name__)
 @dm.route('/', methods=['POST'])
@@ -17,5 +16,3 @@ def index():
         words = []
     return {'data': words}
 
-if __name__ == '__main__':
-    app.run(debug=True)
