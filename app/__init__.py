@@ -11,10 +11,10 @@ def create_app():
 
     from app.routes.movieDetails.dm import dm
     from app.routes.BigScreen.bangdan import bd
-    from app.routes.BigScreen.mapChart import map
+    from app.routes.BigScreen.mapChart import mp
 
     app.register_blueprint(dm, url_prefix='/dm')
-    app.register_blueprint(map, url_prefix='/map')
+    app.register_blueprint(mp, url_prefix='/map')
     app.register_blueprint(bd, url_prefix='/bd')
 
     return app

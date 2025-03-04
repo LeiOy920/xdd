@@ -4,11 +4,10 @@ from sqlalchemy import func
 from app.config import db
 from app.models.map_data import MapData
 
+mp = Blueprint('mp', __name__)
 
-map = Blueprint('map', __name__)
 
-
-@map.route('/', methods=['POST'])
+@mp.route('/', methods=['POST'])
 def getMapData():
     # 查询每个地区的平均评分
     avg_ratings = db.session.query(
@@ -49,4 +48,3 @@ def getMapData():
         }
         result.append(entry)
     return {'data': result}
-

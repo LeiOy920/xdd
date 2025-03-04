@@ -8,6 +8,7 @@ pymysql.install_as_MySQLdb()
 
 app = Flask(__name__)
 
+app.debug = True
 
 # url的格式为：数据库的协议：//用户名：密码@ip地址：端口号（默认可以不写）/数据库名
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:123456@127.0.0.1/moviedb"
