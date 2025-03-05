@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, make_response
 
 from app.models.rankings import Rankings
 
@@ -21,3 +21,29 @@ def getMapData():
             </li>''')
 
     return {'ranking': ''.join(ranking_list)}
+
+
+
+@bd.route('/outputExcel', methods=['POST'])
+def outputExcel():
+    bangdan = request.get_json().get('bangdan')
+    data = Rankings.query.filter_by(ranking_type=bangdan).order_by(Rankings.r_rank.asc()).all()
+
+
+    columns = ['排名', '电影名', '评分' if bangdan == '豆瓣Top250' or bangdan == '猫眼电影Top100' else '票房(国内单位为万元；全球单位为亿元)']
+    data_list = []
+
+    for item in data:
+        data_list.append((item.r_rank, item.movie_name, item.quantity))
+
+    from app.utils.ExcelUtils import export_to_excel
+    excel = export_to_excel(f'{bangdan}.xlsx', 'Sheet1', columns, data_list)
+
+    response = make_response(excel.getvalue())
+
+    response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+    response.headers['Content-Disposition'] = f'attachment; filename={bangdan}.xlsx'
+
+    return excel
+

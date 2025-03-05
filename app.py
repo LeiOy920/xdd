@@ -5,8 +5,6 @@ from flask import request
 
 from app import create_app
 
-
-os.environ['FLASK_ENV'] = 'development'
 app = create_app()
 
 
