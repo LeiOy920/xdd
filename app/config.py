@@ -24,7 +24,7 @@ db = SQLAlchemy(app)
 
 
 # 设置MinIO配置
-app.config['MINIO_ENDPOINT'] = 'localhost:9000'
+app.config['MINIO_ENDPOINT'] = f'{IP}:9000'
 app.config['MINIO_ACCESS_KEY'] = 'minioadmin'
 app.config['MINIO_SECRET_KEY'] = 'minioadmin'
 app.config['MINIO_SECURE'] = False  # 如果使用HTTPS，设为True
@@ -42,6 +42,6 @@ minio_storage = init_minio_storage(app)
 
 
 def connect_to_elasticsearch():
-    es = Elasticsearch(['http://localhost:9200/'])
+    es = Elasticsearch([f'http://{IP}:9200/'])
 
     return es
