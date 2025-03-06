@@ -1,18 +1,12 @@
 import logging
 import os
 import io
-from typing import Union, List, Dict, Tuple, Optional, BinaryIO
-import tempfile
-import json
-from datetime import datetime, timedelta
+from typing import  Optional
 
-from minio.deleteobjects import DeleteObject
-from werkzeug.datastructures import FileStorage
-from flask import current_app, send_file
+from flask import current_app
 from minio import Minio
 from minio.error import S3Error
-from PIL import Image
-import pandas as pd
+
 
 
 class MinIOStorage:
@@ -40,9 +34,12 @@ class MinIOStorage:
 
         :param app: Flask应用实例
         """
+        from app.config import IP
+
+
         # 从应用配置中获取MinIO配置
         self.config = {
-            'MINIO_ENDPOINT': app.config.get('MINIO_ENDPOINT', 'localhost:9000'),
+            'MINIO_ENDPOINT': app.config.get('MINIO_ENDPOINT', IP +':9000'),
             'MINIO_ACCESS_KEY': app.config.get('MINIO_ACCESS_KEY', 'minioadmin'),
             'MINIO_SECRET_KEY': app.config.get('MINIO_SECRET_KEY', 'minioadmin'),
             'MINIO_SECURE': app.config.get('MINIO_SECURE', False),
