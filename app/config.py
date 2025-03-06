@@ -1,3 +1,4 @@
+from elasticsearch import Elasticsearch
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import pymysql
@@ -16,3 +17,8 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:123456@127.0.0.1/moviedb"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # 创建数据库的操作对象
 db = SQLAlchemy(app)
+
+def connect_to_elasticsearch():
+    es = Elasticsearch(['http://localhost:9200/'])
+
+    return es
