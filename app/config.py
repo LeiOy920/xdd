@@ -3,7 +3,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import pymysql
 
-
+from app.utils.minIOUtils import init_minio_storage
 
 pymysql.install_as_MySQLdb()
 
@@ -17,6 +17,25 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://root:123456@127.0.0.1/moviedb"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # 创建数据库的操作对象
 db = SQLAlchemy(app)
+
+
+# 设置MinIO配置
+app.config['MINIO_ENDPOINT'] = 'localhost:9000'
+app.config['MINIO_ACCESS_KEY'] = 'minioadmin'
+app.config['MINIO_SECRET_KEY'] = 'minioadmin'
+app.config['MINIO_SECURE'] = False  # 如果使用HTTPS，设为True
+
+# 自定义存储桶配置
+app.config['MINIO_BUCKETS'] = {
+    'wordclouds': 'movie-wordclouds',
+    'reviews': 'movie-reviews',
+    'posters': 'movie-posters',
+    'analytics': 'movie-analytics'
+}
+
+# 初始化MinIO存储
+minio_storage = init_minio_storage(app)
+
 
 def connect_to_elasticsearch():
     es = Elasticsearch(['http://localhost:9200/'])
