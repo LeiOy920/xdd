@@ -1,6 +1,6 @@
 import pandas as pd
 
-def export_to_excel(file_name, sheet_name, columns, data):
+def export_to_excel(sheet_name, columns, data):
     """
     Export data to an Excel file.
 

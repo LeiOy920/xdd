@@ -24,9 +24,9 @@ def getMapData():
 
 
 
-@bd.route('/outputExcel', methods=['POST'])
+@bd.route('/outputExcel', methods=['GET'])
 def outputExcel():
-    bangdan = request.get_json().get('bangdan')
+    bangdan = request.args.get('bangdan')
     data = Rankings.query.filter_by(ranking_type=bangdan).order_by(Rankings.r_rank.asc()).all()
 
 
@@ -37,13 +37,13 @@ def outputExcel():
         data_list.append((item.r_rank, item.movie_name, item.quantity))
 
     from app.utils.ExcelUtils import export_to_excel
-    excel = export_to_excel(f'{bangdan}.xlsx', 'Sheet1', columns, data_list)
+    excel = export_to_excel( 'Sheet1', columns, data_list)
 
     response = make_response(excel.getvalue())
 
-    response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    # 设置Content-Type和Content-Disposition头信息
+    response.headers['Content-Type'] = 'application/vnd.ms-excel'
+    filename = f'{bangdan}.xlsx'
+    response.headers['Content-Disposition'] = f'attachment; filename={filename.encode("utf-8").decode("latin-1")}'
 
-    response.headers['Content-Disposition'] = f'attachment; filename={bangdan}.xlsx'
-
-    return excel
-
+    return response
