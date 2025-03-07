@@ -14,12 +14,13 @@ def create_app():
     from app.routes.BigScreen.mapChart import mp
     from app.routes.realtime.main_panel import mainpanel
     from app.routes.es.search import ess
-
+    from app.routes.BigScreen.BoxOfficeTrend import trend
     app.register_blueprint(dm, url_prefix='/dm')
     app.register_blueprint(mp, url_prefix='/map')
     app.register_blueprint(bd, url_prefix='/bd')
     app.register_blueprint(mainpanel, url_prefix='/mainpanel')
     app.register_blueprint(ess, url_prefix='/es')
     app.register_blueprint(detail, url_prefix='/detail')
+    app.register_blueprint(trend, url_prefix='/trend')
 
     return app
