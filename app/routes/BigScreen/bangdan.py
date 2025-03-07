@@ -1,5 +1,7 @@
+import pandas as pd
 from flask import Blueprint, request, make_response
 
+from app.config import minio_storage
 from app.models.rankings import Rankings
 
 bd = Blueprint('bd', __name__)
@@ -47,3 +49,30 @@ def outputExcel():
     response.headers['Content-Disposition'] = f'attachment; filename={filename.encode("utf-8").decode("latin-1")}'
 
     return response
+
+@bd.route('/getTypeChart', methods=['POST'])
+def getTypeChart():
+    file = minio_storage.get_file(object_name='coming_tyep.xlsx',
+                                  bucket_name='movie-analytics')  # 包含文件内容的BytesIO对象，或None（如果文件不存在）
+    if file is not None:
+        excel_data = pd.read_excel(file, sheet_name='Sheet1')
+        type = excel_data.iloc[:, 0].str.strip().tolist()
+        num = excel_data.iloc[:, 1].astype(int).tolist()
+        return {'type': type,
+                'num': num}
+    else:
+        return {}
+
+
+@bd.route('/getRadarChart', methods=['POST'])
+def getRadarChart():
+    file = minio_storage.get_file(object_name='1905type_average_scores.xlsx',
+                                  bucket_name='movie-analytics')  # 包含文件内容的BytesIO对象，或None（如果文件不存在）
+    if file is not None:
+        excel_data = pd.read_excel(file, sheet_name='Sheet1')
+        type = excel_data.iloc[:, 0].str.strip().tolist()
+        num = excel_data.iloc[:, 1].round(2).tolist()
+        return {'type': type,
+                'num': num}
+    else:
+        return {}

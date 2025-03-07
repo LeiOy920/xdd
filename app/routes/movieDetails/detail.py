@@ -19,7 +19,6 @@ def getMovieDetails():
     if id is not None:
         movie_basic = MovieDetail.query.filter_by(id=id).first()
     else:
-        print(movie_name)
         movie_basic = MovieDetail.query.filter(MovieDetail.movie_name == movie_name).first()
 
     if movie_basic is None:
