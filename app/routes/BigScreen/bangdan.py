@@ -76,3 +76,10 @@ def getRadarChart():
                 'num': num}
     else:
         return {}
+
+
+@bd.route('/getPrivilege', methods=['POST'])
+def getPrivilege():
+    movie_name = request.get_json().get('movie_name')
+    data = Rankings.query.filter_by(Rankings.movie_name == movie_name).all()
+    return {'privileges': [item.ranking_type for item in data]}
