@@ -2,6 +2,7 @@ import pandas as pd
 from flask import Blueprint, request, make_response
 
 from app.config import minio_storage
+from app.models.moviedetail import MovieDetail
 from app.models.rankings import Rankings
 
 bd = Blueprint('bd', __name__)
@@ -72,8 +73,17 @@ def getRadarChart():
         excel_data = pd.read_excel(file, sheet_name='Sheet1')
         type = excel_data.iloc[:, 0].str.strip().tolist()
         num = excel_data.iloc[:, 1].round(2).tolist()
-        return {'type': type,
-                'num': num}
+
+
+
+        return {'SixMovie':
+                    {
+                        'type': type,
+                        'num': num
+                    },
+                'DBmovie': getDBData(),
+                'MYmovie': getMYData()
+                }
     else:
         return {}
 
@@ -83,3 +93,32 @@ def getPrivilege():
     movie_name = request.get_json().get('movie_name')
     data = Rankings.query.filter_by(movie_name = movie_name).all()
     return {'privileges': [item.ranking_type for item in data]}
+
+
+def getDBData():
+    data = Rankings.query.filter_by(ranking_type='豆瓣Top250').all()
+    movie_names = [item.movie_name for item in data]
+    movie_details = MovieDetail.query.filter(MovieDetail.movie_name.in_(movie_names)).all()
+    from collections import defaultdict
+    type_ratings = defaultdict(list)
+    for movie in movie_details:
+        genres = movie.genre.split()
+        for genre in genres:
+            type_ratings[genre].append(movie.douban_rating)
+    average_ratings = {genre: round(sum(ratings) / len(ratings), 2) for genre, ratings in type_ratings.items()}
+    return {'type': list(average_ratings.keys()),
+            'num': list(average_ratings.values())}
+
+def getMYData():
+    data = Rankings.query.filter_by(ranking_type='猫眼电影Top100').all()
+    movie_names = [item.movie_name for item in data]
+    movie_details = MovieDetail.query.filter(MovieDetail.movie_name.in_(movie_names)).all()
+    from collections import defaultdict
+    type_ratings = defaultdict(list)
+    for movie in movie_details:
+        genres = movie.genre.split()
+        for genre in genres:
+            type_ratings[genre].append(next(item.quantity for item in data if item.movie_name == movie.movie_name))
+    average_ratings = {genre: round(sum(map(float, ratings)) / len(ratings), 2) for genre, ratings in type_ratings.items()}
+    return {'type': list(average_ratings.keys()),
+            'num': list(average_ratings.values())}
