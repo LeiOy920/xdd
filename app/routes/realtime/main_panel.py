@@ -7,7 +7,7 @@ mainpanel = Blueprint('mainpanel', __name__)
 
 
 @mainpanel.route('/', methods=['POST','GET'])
-def getMapData():
+def getPanelData():
     # 查询最新时间的票房数据，按票房金额降序排序
     data = BoxTimely.query. filter(BoxTimely.proportion.isnot(None)) \
         .order_by(func.cast(BoxTimely.today_box, db.Float).desc()) \
@@ -25,10 +25,14 @@ def getMapData():
             "occupancy_rate": item.occupancy_rate,
             "release_days": item.release_days,
             "total_box": item.total_box,
-            "isStarred": False
+            "isStarred": False,
+            "day1_box": item.day1_box,
+            "day2_box": item.day2_box,
+            "day3_box": item.day3_box,
+            "day4_box": item.day4_box
+
         }
         for item in data
     ]
-    print(ranking_list)
     return jsonify(ranking_list)
 
