@@ -19,7 +19,6 @@ def getMovieDetails():
     if id is not None:
         movie_basic = MovieDetail.query.filter_by(id=id).first()
     else:
-        print(movie_name)
         movie_basic = MovieDetail.query.filter(MovieDetail.movie_name == movie_name).first()
 
     if movie_basic is None:
@@ -39,7 +38,7 @@ def getMovieDetails():
             'douban_rating': movie_basic.douban_rating,
             'also_known_as': movie_basic.also_known_as,
             'genre': movie_basic.genre.split(),
-            'starring': movie_basic.staring.split() if movie_basic.starring else [],
+            'starring': movie_basic.starring.split() if movie_basic.starring else [],
             'ciyun_image': 'b.png',
             'sentiment_score': {'average_score': sentiment_score.average_score,
                               'total_references': sentiment_score.total_references,
@@ -71,7 +70,7 @@ def download_image():
 @detail.route('/getWordCloud', methods=['GET'])
 def getWordCloud():
     id = request.args.get('id')
-    file = minio_storage.get_file(object_name=f'word_cloud{id}.png', bucket_name='movie-wordclouds')
+    file = minio_storage.get_file(object_name=f'word_cloud_gold{id}.png', bucket_name='movie-wordclouds')
     if file is not None:
         image_base64 = base64.b64encode(file.read()).decode('utf-8')
     else:
