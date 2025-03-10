@@ -16,6 +16,7 @@ def create_app():
     from app.routes.BigScreen.BoxOfficeTrend import trend
     from app.routes.BigScreen.personnel import personnel
     from app.routes.movieDetails.detail import detail
+    from app.routes.movieDetails.movie_recommend import mr_blueprint
 
     app.register_blueprint(dm, url_prefix='/dm')
     app.register_blueprint(mp, url_prefix='/map')
@@ -26,5 +27,6 @@ def create_app():
     app.register_blueprint(detail, url_prefix='/detail')
     app.register_blueprint(trend, url_prefix='/trend')
     app.register_blueprint(personnel, url_prefix='/personnel')
+    app.register_blueprint(mr_blueprint, url_prefix='/mr')
 
     return app
