@@ -67,4 +67,5 @@ def getPanelData():
         }
         for item in query_result
     ]
+
     return jsonify(ranking_list)
