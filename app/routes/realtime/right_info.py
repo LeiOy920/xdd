@@ -3,6 +3,9 @@ from sqlalchemy import func
 from app.models.box_timely import BoxTimely
 from app.config import db
 from datetime import datetime, timedelta
+import base64
+
+import requests
 
 
 rightinfo = Blueprint('rightinfo', __name__)
@@ -28,5 +31,5 @@ def getDate():
     dates = [today.strftime("%m/%d")]
     for i in range(1, num_days + 1):
         dates.append((today - timedelta(days=i)).strftime("%m/%d"))
-    print(dates)
+    # print(dates)
     return dates
