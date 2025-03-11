@@ -1,6 +1,6 @@
 import random
 import time
-
+from sqlalchemy import text
 import requests
 from bs4 import BeautifulSoup
 from flask import Blueprint
@@ -12,15 +12,15 @@ pb = Blueprint('pb', __name__)
 @pb.route('/getProvinceBox', methods=['GET'])
 def getProvinceBox():
     # 查询数据库
+    intoDB()
     box = ProvinceBox.query.all()
     box_list = []
     for item in box:
         box_list.append({
-            'province': item[0],
-            'box_count': item[1]
+            'province': item.p_name,
+            'box_count': item.box_count
         })
     return {'box': box_list}
-
 
 def intoDB():
     box = getProviceBox()
@@ -31,11 +31,11 @@ def intoDB():
         province = item['province']
         today_box = item['today_box']
         # 保存到数据库的province_box表中
-        db.session.execute(
-            "INSERT INTO province_box (province, box_count) VALUES (:province, :today_box) "
-            "ON DUPLICATE KEY UPDATE box_count = :today_box",
-            {'province': province, 'today_box': today_box}
+        sql = text(
+            "INSERT INTO province_box (p_name, box_count) VALUES (:province, :today_box) "
+            "ON DUPLICATE KEY UPDATE box_count = :today_box"
         )
+        db.session.execute(sql,{'province': province, 'today_box': today_box})
         db.session.commit()
     return 'ok'
 
@@ -68,11 +68,14 @@ def getProviceBox():
         name = tds[0].find('span', class_='table-cell-content').string
         today_box = tds[1].find('span').string
         if today_box.endswith('万'):
-            today_box = float(today_box[:-2]) * 10000
+            today_box = str(today_box).split('万')[0]
+        elif today_box.endswith('亿'):
+            today_box = float(str(today_box).split('万')[0]) * 10000
         else:
-            today_box = float(today_box)
+            today_box = float(today_box)/10000
         box.append({
             'province': name,
             'today_box': today_box
         })
+    print(box)
     return box
