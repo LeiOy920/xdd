@@ -4,6 +4,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import requests
 from bs4 import BeautifulSoup
 
+from app.config import IP
 
 
 def getProviceBox():
@@ -43,5 +44,30 @@ def getProviceBox():
             'province': name,
             'today_box': today_box
         })
-    print(box)
+    from sqlalchemy import create_engine, text
+    from sqlalchemy.orm import sessionmaker
+    from app.models.province_box import ProvinceBox
+
+    # Database connection setup
+    engine = create_engine(f"mysql://root:123456@{IP}/moviedb")
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    # Update database with the new data
+    for item in box:
+        province = item['province']
+        today_box = item['today_box']
+        # Check if the province already exists in the database
+        existing_record = session.query(ProvinceBox).filter_by(p_name=province).first()
+        if existing_record:
+            # Update the existing record
+            existing_record.box_count = today_box
+        else:
+            # Insert a new record
+            new_record = ProvinceBox(p_name=province, box_count=today_box)
+            session.add(new_record)
+
+    # Commit the transaction
+    session.commit()
+    session.close()
     return box
