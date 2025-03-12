@@ -77,5 +77,4 @@ def getProviceBox():
             'province': name,
             'today_box': today_box
         })
-    print(box)
     return box
