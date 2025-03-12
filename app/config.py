@@ -1,3 +1,7 @@
+import logging
+import os
+from logging.handlers import RotatingFileHandler
+
 from elasticsearch import Elasticsearch
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -11,8 +15,20 @@ app = Flask(__name__)
 
 app.debug = True
 
+# 配置日志记录
+if not os.path.exists('logs'):
+    os.mkdir('logs')
+file_handler = RotatingFileHandler('logs/app.log', maxBytes=10240, backupCount=10)
+file_handler.setFormatter(logging.Formatter(
+    '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+))
+file_handler.setLevel(logging.INFO)
+app.logger.addHandler(file_handler)
 
-IP = '192.168.58.40'  # 统管IP
+app.logger.setLevel(logging.INFO)
+app.logger.info('App startup')
+
+IP = '127.0.0.1'  # 统管IP
 
 
 # url的格式为：数据库的协议：//用户名：密码@ip地址：端口号（默认可以不写）/数据库名
