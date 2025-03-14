@@ -1,18 +1,22 @@
-import re
+
 import time
 import pandas as pd
 import requests
+from apscheduler.schedulers.background import BackgroundScheduler
 from bs4 import BeautifulSoup
-from lxml import etree
+
 from datetime import date
 import random
-import csv
+
 from fake_useragent import UserAgent  # ⽣成随机User-Agent以避免被识别为⾃动化脚本
 import json
-import openpyxl
+
 from sqlalchemy import create_engine,text
 
-while True:
+from app.config import IP
+
+
+def getTimelyBox():
     user_agents = [
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
         'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0',
@@ -58,7 +62,6 @@ while True:
     data = json.loads(html)
     data = data["movieList"]["list"]
 
-
     for cbo_data in data:
         # 上座率数据
         movieName = cbo_data['movieInfo']['movieName']
@@ -86,7 +89,6 @@ while True:
                 # data01 = json.loads(html01)
                 # data01 = data01["movieInfo"]["boxTrends"]
 
-
                 # 因为有时会出错，出错则每隔10s自动刷新直到正确,最多刷新2次
                 max_retries = 2
                 retry_delay = 10
@@ -113,14 +115,18 @@ while True:
                 # 字典推导式初始化字典
                 trends = {key: 0 for key in keys}
                 # 遍历 data 列表，将 boxDesc 值依次赋给对应的键
+                # Ensure the string is not empty before converting to float
                 for i, item in enumerate(data01):
                     if i < len(keys):
-                        if str(item["boxDesc"]).endswith("万"):
-                            trends[keys[len(data01) - i - 1]] = str(item["boxDesc"]).split('万')[0]
-                        elif str(item["boxDesc"]).endswith("亿"):
-                            trends[keys[len(data01) - i - 1]] = float(str(item["boxDesc"]).split('亿')[0])*10000
+                        box_desc = item["boxDesc"]
+                        if box_desc.endswith("万"):
+                            trends[keys[len(data01) - i - 1]] = box_desc.split('万')[0]
+                        elif box_desc.endswith("亿"):
+                            trends[keys[len(data01) - i - 1]] = float(box_desc.split('亿')[0]) * 10000
+                        elif box_desc:  # Check if box_desc is not empty
+                            trends[keys[len(data01) - i - 1]] = float(box_desc) / 10000
                         else:
-                            trends[keys[len(data01) - i - 1]] = float(item["boxDesc"])/10000
+                            trends[keys[len(data01) - i - 1]] = 0  # Handle empty string case
 
                 movie['day4_box'] = (trends['day_4'])
                 movie['day3_box'] = (trends['day_3'])
@@ -146,10 +152,9 @@ while True:
     cleaned_df = pd.concat([df.iloc[:1], cleaned_subset], ignore_index=True)
     print(cleaned_df)
     # 指定要保存的 Excel 文件路径
-    engine = create_engine("mysql://root:123456@192.168.58.41/moviedb")
+    engine = create_engine(f"mysql://root:123456@{IP}/moviedb")
     truncate_statement = text("TRUNCATE TABLE box_timely")
     # 将 DataFrame 写入 Excel 文件
     with engine.connect() as connection:
         connection.execute(truncate_statement)
     cleaned_df.to_sql('box_timely', con=engine, if_exists='append', index=False)
-    time.sleep(60)

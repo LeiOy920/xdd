@@ -2,10 +2,16 @@ from flask import Flask
 from flask_cors import CORS
 
 
+
 def create_app():
     from app.config import app
 
     CORS(app)
+
+
+
+    from app.utils.TimeTask.init import init_scheduler
+    init_scheduler(app)
 
     from app.routes.movieDetails.dm import dm
     from app.routes.BigScreen.bangdan import bd
