@@ -107,7 +107,7 @@ def getTimelyBox():
                     time.sleep(retry_delay)
                 if attempt == max_retries - 1:
                     data01 = []
-                    print(f"将{url01}的票房趋势设置为[]数据")
+                    # print(f"将{url01}的票房趋势设置为[]数据")
 
                 # 定义字典的键
                 # keys = ['day_4', 'day_3', 'day_2', 'day_1','day_0']
@@ -126,7 +126,7 @@ def getTimelyBox():
                         elif box_desc:  # Check if box_desc is not empty
                             trends[keys[len(data01) - i - 1]] = float(box_desc) / 10000
                         else:
-                            trends[keys[len(data01) - i - 1]] = 0  # Handle empty string case
+                            trends[keys[len(data01) - i - 1]] = 0  # Handle empty string casep
 
                 movie['day4_box'] = (trends['day_4'])
                 movie['day3_box'] = (trends['day_3'])
@@ -150,7 +150,7 @@ def getTimelyBox():
     subset = df.iloc[1:]
     cleaned_subset = subset.dropna()
     cleaned_df = pd.concat([df.iloc[:1], cleaned_subset], ignore_index=True)
-    print(cleaned_df)
+    # print(cleaned_df)
     # 指定要保存的 Excel 文件路径
     engine = create_engine(f"mysql://root:123456@{IP}/moviedb")
     truncate_statement = text("TRUNCATE TABLE box_timely")
