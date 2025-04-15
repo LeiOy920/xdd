@@ -34,12 +34,12 @@ class MinIOStorage:
 
         :param app: Flask应用实例
         """
-        from app.config import IP
+        from app.config import MINIO_ENDPOINT
 
 
         # 从应用配置中获取MinIO配置
         self.config = {
-            'MINIO_ENDPOINT': app.config.get('MINIO_ENDPOINT', IP +':9000'),
+            'MINIO_ENDPOINT': app.config.get('MINIO_ENDPOINT', MINIO_ENDPOINT),
             'MINIO_ACCESS_KEY': app.config.get('MINIO_ACCESS_KEY', 'minioadmin'),
             'MINIO_SECRET_KEY': app.config.get('MINIO_SECRET_KEY', 'minioadmin'),
             'MINIO_SECURE': app.config.get('MINIO_SECURE', False),

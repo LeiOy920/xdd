@@ -1,4 +1,3 @@
-
 import time
 import pandas as pd
 import requests
@@ -13,7 +12,7 @@ import json
 
 from sqlalchemy import create_engine,text
 
-from app.config import IP
+from app.config import DATABASE_URL
 
 
 def getTimelyBox():
@@ -152,7 +151,7 @@ def getTimelyBox():
     cleaned_df = pd.concat([df.iloc[:1], cleaned_subset], ignore_index=True)
     # print(cleaned_df)
     # 指定要保存的 Excel 文件路径
-    engine = create_engine(f"mysql://root:123456@{IP}/moviedb")
+    engine = create_engine(DATABASE_URL)
     truncate_statement = text("TRUNCATE TABLE box_timely")
     # 将 DataFrame 写入 Excel 文件
     with engine.connect() as connection:

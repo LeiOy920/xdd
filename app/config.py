@@ -13,7 +13,7 @@ pymysql.install_as_MySQLdb()
 
 app = Flask(__name__)
 
-app.debug = True
+app.debug = os.environ.get('FLASK_ENV') == 'development'
 
 # 配置日志记录
 if not os.path.exists('logs'):
@@ -28,22 +28,23 @@ app.logger.addHandler(file_handler)
 app.logger.setLevel(logging.INFO)
 app.logger.info('App startup')
 
-IP = '192.168.58.71'  # 统管IP
+# 从环境变量获取配置
+DATABASE_URL = os.environ.get('DATABASE_URL', 'mysql://root:123456@127.0.0.1/moviedb')
+MINIO_ENDPOINT = os.environ.get('MINIO_ENDPOINT', '127.0.0.1:9000')
+MINIO_ACCESS_KEY = os.environ.get('MINIO_ACCESS_KEY', 'minioadmin')
+MINIO_SECRET_KEY = os.environ.get('MINIO_SECRET_KEY', 'minioadmin')
+ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL', 'http://127.0.0.1:9200/')
 
-
-# url的格式为：数据库的协议：//用户名：密码@ip地址：端口号（默认可以不写）/数据库名
-app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql://root:123456@{IP}/moviedb"
-# 动态追踪数据库的修改. 性能不好. 且未来版本中会移除. 目前只是为了解决控制台的提示才写的
+# 配置数据库
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-# 创建数据库的操作对象
 db = SQLAlchemy(app)
 
-
 # 设置MinIO配置
-app.config['MINIO_ENDPOINT'] = f'{IP}:9000'
-app.config['MINIO_ACCESS_KEY'] = 'minioadmin'
-app.config['MINIO_SECRET_KEY'] = 'minioadmin'
-app.config['MINIO_SECURE'] = False  # 如果使用HTTPS，设为True
+app.config['MINIO_ENDPOINT'] = MINIO_ENDPOINT
+app.config['MINIO_ACCESS_KEY'] = MINIO_ACCESS_KEY
+app.config['MINIO_SECRET_KEY'] = MINIO_SECRET_KEY
+app.config['MINIO_SECURE'] = True  # 在生产环境中使用 HTTPS
 
 # 自定义存储桶配置
 app.config['MINIO_BUCKETS'] = {
@@ -56,8 +57,6 @@ app.config['MINIO_BUCKETS'] = {
 # 初始化MinIO存储
 minio_storage = init_minio_storage(app)
 
-
 def connect_to_elasticsearch():
-    es = Elasticsearch([f'http://{IP}:9200/'])
-
+    es = Elasticsearch([ELASTICSEARCH_URL])
     return es

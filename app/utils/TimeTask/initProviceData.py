@@ -4,7 +4,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import requests
 from bs4 import BeautifulSoup
 
-from app.config import IP
+from app.config import DATABASE_URL
 
 
 def getProviceBox():
@@ -49,7 +49,7 @@ def getProviceBox():
     from app.models.province_box import ProvinceBox
 
     # Database connection setup
-    engine = create_engine(f"mysql://root:123456@{IP}/moviedb")
+    engine = create_engine(DATABASE_URL)
     Session = sessionmaker(bind=engine)
     session = Session()
 
